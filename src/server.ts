@@ -56,6 +56,8 @@ app.get('/', (req:Request, res:Response) => {
   res.send('Hello Shihab Shahriar!')
 })
 
+
+//users CRUD create
 app.post("/users", async (req:Request,res:Response)=>{
     // console.log(req.body);
     const {name,email} = req.body;
@@ -65,7 +67,7 @@ app.post("/users", async (req:Request,res:Response)=>{
         // console.log(result.rows[0]);
         // res.send({message:"data inserted"})
         res.status(201).json({
-            success: false,
+            success: true,
             message: "Data Inserted Successfully",
             data: result.rows[0],
         })
@@ -77,12 +79,50 @@ app.post("/users", async (req:Request,res:Response)=>{
         })
     }
 
+})
 
+//get all users
+app.get("/users",async (req: Request,res: Response)=>{
+    try {
+        const result = await pool.query(`SELECT * FROM users`);
+        res.status(200).json({
+            success: true,
+            message: "Users retrieved Successfully",
+            data: result.rows})
+    } catch (err: any ) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+            details: err
+        })
+    }
+})
 
-    res.status(201).json({
-        success: true,
-        message: "Api is working"
-    })
+app.get("/users/:id",async (req: Request,res: Response)=>{
+    // console.log(req.params.id);
+    // res.send({ massage: "API is cool......"})
+    try {
+        const result = await pool.query(`SELECT * FROM users WHERE id = $1`,[req.params.id]);
+
+        if(result.rows.length ===0){
+            res.status(404).json({
+                success: false,
+                message: "User not found",
+            }) 
+        }else{
+            res.status(200).json({
+                success: true,
+                message: "User fetched successfully",
+                data:result.rows[0],
+            })
+        }
+    } catch (err: any ) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+            details: err
+        })
+    }
 })
 
 app.listen(port, () => {
