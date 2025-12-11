@@ -56,8 +56,9 @@ app.get('/', (req:Request, res:Response) => {
   res.send('Hello Shihab Shahriar!')
 })
 
+//User CRUD
 
-//users CRUD create
+//users create
 app.post("/users", async (req:Request,res:Response)=>{
     // console.log(req.body);
     const {name,email} = req.body;
@@ -185,6 +186,48 @@ app.delete("/users/:id",async (req: Request,res: Response)=>{
         })
     }
 })
+
+
+//todos crud
+
+//todo create
+app.post("/todos", async(req: Request, res: Response)=>{
+    const {user_id,tittle} = req.body;
+
+    try {
+        const result = await pool.query(`INSERT INTO todos(user_id, tittle) VALUES ($1,$2) RETURNING *`,[user_id,tittle])
+
+        res.status(201).json({
+            success: true,
+            message: "Todo created",
+            data: result.rows[0]
+        })
+    } catch (err: any) {
+        res.status(500).json({
+            success: false ,
+            message: err.message,
+        })
+    }
+})
+
+//get all todos
+app.get("/todos",async (req: Request,res: Response)=>{
+    try {
+        const result = await pool.query(`SELECT * FROM todos`);
+        res.status(200).json({
+            success: true,
+            message: "Todos retrieved Successfully",
+            data: result.rows})
+    } catch (err: any ) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+            details: err
+        })
+    }
+})
+
+
 
 
 
