@@ -98,6 +98,7 @@ app.get("/users",async (req: Request,res: Response)=>{
     }
 })
 
+// get single user
 app.get("/users/:id",async (req: Request,res: Response)=>{
     // console.log(req.params.id);
     // res.send({ massage: "API is cool......"})
@@ -124,6 +125,68 @@ app.get("/users/:id",async (req: Request,res: Response)=>{
         })
     }
 })
+
+
+//update user
+app.put("/users/:id",async (req: Request,res: Response)=>{
+    // console.log(req.params.id);
+    // res.send({ massage: "API is cool......"})
+    const {name,email}=req.body;
+    try {
+        const result = await pool.query(`UPDATE users SET name=$1,email=$2 WHERE id=$3 RETURNING *`,[name,email,req.params.id]);
+
+        if(result.rows.length ===0){
+            res.status(404).json({
+                success: false,
+                message: "User not found",
+            }) 
+        }else{
+            res.status(200).json({
+                success: true,
+                message: "User updated successfully",
+                data:result.rows[0],
+            })
+        }
+    } catch (err: any ) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+            details: err
+        })
+    }
+})
+
+//delete user
+app.delete("/users/:id",async (req: Request,res: Response)=>{
+    // console.log(req.params.id);
+    // res.send({ massage: "API is cool......"})
+    try {
+        const result = await pool.query(`DELETE FROM users WHERE id =$1`,[req.params.id]);
+
+        // console.log(result);
+
+        if(result.rowCount === 0){
+            res.status(404).json({
+                success: false,
+                message: "User not found",
+            }) 
+        }else{
+            res.status(200).json({
+                success: true,
+                message: "User deleted successfully",
+                data:result.rows,
+            })
+        }
+    } catch (err: any ) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+            details: err
+        })
+    }
+})
+
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
