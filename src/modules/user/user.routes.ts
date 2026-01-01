@@ -7,6 +7,8 @@ const router = Router();
 
 import express from "express";
 import { userController } from "./user.controller";
+import logger from "../../middleware/logger";
+import auth from "../../middleware/auth";
 
 const router = express.Router();
 
@@ -18,7 +20,7 @@ const router = express.Router();
 router.post("/",userController.createUser);
 
 //get all users
-router.get("/",userController.getAllUsers);
+router.get("/",logger,auth(), userController.getAllUsers);
 
 //get single user
 router.get('/:id',userController.getSingleUser);
