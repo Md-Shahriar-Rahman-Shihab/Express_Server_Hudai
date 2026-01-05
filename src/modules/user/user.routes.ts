@@ -20,10 +20,10 @@ const router = express.Router();
 router.post("/",userController.createUser);
 
 //get all users
-router.get("/",logger,auth(), userController.getAllUsers);
+router.get("/",logger,auth("admin"), userController.getAllUsers);
 
 //get single user
-router.get('/:id',userController.getSingleUser);
+router.get('/:id',auth("admin","user"),userController.getSingleUser);
 
 //update user
 router.put("/:id",userController.updateUser);
